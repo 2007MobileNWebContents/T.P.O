@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="sightMapper">
+
+	<insert id="insertSightList">
+	INSERT INTO SIGHTLIST
+	VALUES(#{sNo}, #{image}, #{addr}, #{title})
+	</insert>
+	<insert id="insertSight">
+		INSERT INTO SIGHT
+		VALUES(#{sNo}, #{sName}, #{sLocation}, #{sIntroduce}, 
+		#{sPicture}, #{restDate}, #{sParking}, #{sBabyCarriage}, #{sPet})
+	</insert>
+	
+	<select id="selectSight" resultType="Sight">
+		SELECT * FROM SIGHT 
+		WHERE SNO=#{sNo}
+	</select>
+	
+	<select id="selectSightList" resultType="Sight">
+      SELECT * FROM SIGHT
+      ORDER BY SNO DESC
+   </select>
+   
+   <select id="selectChkList" resultType="Sight" parameterType="HashMap">
+   	<if test="sLocation==''">
+      	<if test="parking == 0 and babyCar == 0 and pet == 0">
+   			select * from sight order by sno desc
+   		</if>
+   		<if test="parking == 1 and babyCar == 0 and pet == 0">
+   			select * from sight where sparking like '%있음%' order by sno desc
+   		</if>
+   		<if test="parking == 0 and babyCar == 1 and pet == 0">
+   		 	select * from sight where SBABYCARRIAGE!='없음' and SBABYCARRIAGE!='불가' order by sno desc
+   		</if> 
+   		<if test="parking == 0 and babyCar == 0 and pet == 1">
+   		 	select * from sight where spet!='불가' and spet!='없음' order by sno desc
+   		</if> 
+  		<if test="parking == 1 and babyCar == 1 and pet == 0">
+  			select * from sight where SBABYCARRIAGE!='없음' and SBABYCARRIAGE!='불가' and sparking like '%있음%' order by sno desc
+   		</if>
+   		 <if test="parking == 0 and babyCar == 1 and pet == 1">
+   		 	select * from sight where SBABYCARRIAGE!='없음' and SBABYCARRIAGE!='불가' and spet!='불가' and spet!='없음' order by sno desc
+   		</if> 
+   		<if test="parking == 1 and babyCar == 0 and pet == 1">
+   			select * from sight where sparking like '%주차 가능%' and sparking='있음' and spet!='불가' and spet!='없음' order by sno desc
+   		</if> 
+   		<if test="parking == 1 and babyCar == 1 and pet == 1">
+   			select * from sight where sparking like '%주차 가능%' and sparking='있음' and SBABYCARRIAGE!='없음' and SBABYCARRIAGE!='불가' and spet!='불가' and spet!='없음' order by sno desc
+   		</if>
+   	</if>
+   	 <if test="sLocation!=''">
+      	<if test="parking == 0 and babyCar == 0 and pet == 0">
+   			select * from sight where slocation like '%' || #{sLocation} || '%' order by sno desc
+   		</if>
+   		<if test="parking == 1 and babyCar == 0 and pet == 0">
+   			select * from sight where slocation like '%' || #{sLocation} || '%' and sparking like '%있음%' order by sno desc
+   		</if>
+   		<if test="parking == 0 and babyCar == 1 and pet == 0">
+   		 	select * from sight where slocation like '%' || #{sLocation} || '%' and SBABYCARRIAGE!='없음' and SBABYCARRIAGE!='불가' order by sno desc
+   		</if> 
+   		<if test="parking == 0 and babyCar == 0 and pet == 1">
+   		 	select * from sight where slocation like '%' || #{sLocation} || '%' and spet!='불가' and spet!='없음' order by sno desc
+   		</if> 
+  		<if test="parking == 1 and babyCar == 1 and pet == 0">
+  			select * from sight where slocation like '%' || #{sLocation} || '%' and SBABYCARRIAGE!='없음' and SBABYCARRIAGE!='불가' and sparking like '%있음%' order by sno desc
+   		</if>
+   		 <if test="parking == 0 and babyCar == 1 and pet == 1">
+   		 	select * from sight where slocation like '%' || #{sLocation} || '%' and SBABYCARRIAGE!='없음' and SBABYCARRIAGE!='불가' and spet!='불가' and spet!='없음' order by sno desc
+   		</if> 
+   		<if test="parking == 1 and babyCar == 0 and pet == 1">
+   			select * from sight where slocation like '%' || #{sLocation} || '%' and sparking like '%주차 가능%' and sparking='있음' and spet!='불가' and spet!='없음' order by sno desc
+   		</if> 
+   		<if test="parking == 1 and babyCar == 1 and pet == 1">
+   			select * from sight where slocation like '%' || #{sLocation} || '%' and sparking like '%주차 가능%' and sparking='있음' and SBABYCARRIAGE!='없음' and SBABYCARRIAGE!='불가' and spet!='불가' and spet!='없음' order by sno desc
+   		</if>
+   	</if>
+   </select>
+   
+   <select id="getChkCount" resultType="int" parameterType="HashMap">
+    <if test="sLocation==''">
+      	<if test="parking == 0 and babyCar == 0 and pet == 0">
+   			select count(*) from sight 
+   		</if>
+   		<if test="parking == 1 and babyCar == 0 and pet == 0">
+   			select count(*) from sight where sparking like '%있음%'
+   		</if>
+   		<if test="parking == 0 and babyCar == 1 and pet == 0">
+   		 	select count(*) from sight where SBABYCARRIAGE!='없음' and SBABYCARRIAGE!='불가'
+   		</if> 
+   		<if test="parking == 0 and babyCar == 0 and pet == 1">
+   		 	select count(*) from sight where spet!='불가' and spet!='없음' 
+   		</if> 
+  		<if test="parking == 1 and babyCar == 1 and pet == 0">
+  			select count(*) from sight where SBABYCARRIAGE!='없음' and SBABYCARRIAGE!='불가' and sparking like '%있음%' 
+   		</if>
+   		 <if test="parking == 0 and babyCar == 1 and pet == 1">
+   		 	select count(*) from sight where SBABYCARRIAGE!='없음' and SBABYCARRIAGE!='불가' and spet!='불가' and spet!='없음'
+   		</if> 
+   		<if test="parking == 1 and babyCar == 0 and pet == 1">
+   			select count(*) from sight where sparking like '%주차 가능%' and sparking='있음' and spet!='불가' and spet!='없음' 
+   		</if> 
+   		<if test="parking == 1 and babyCar == 1 and pet == 1">
+   			select count(*) from sight where sparking like '%주차 가능%' and sparking='있음' and SBABYCARRIAGE!='없음' and SBABYCARRIAGE!='불가' and spet!='불가' and spet!='없음'
+   		</if>
+   	</if>
+   	<if test="sLocation!=''">
+      	<if test="parking == 0 and babyCar == 0 and pet == 0">
+   			select count(*) from sight where slocation like '%' || #{sLocation} || '%'
+   		</if>
+   		<if test="parking == 1 and babyCar == 0 and pet == 0">
+   			select count(*) from sight where slocation like '%' || #{sLocation} || '%' and sparking like '%있음%'
+   		</if>
+   		<if test="parking == 0 and babyCar == 1 and pet == 0">
+   		 	select count(*) from sight where slocation like '%' || #{sLocation} || '%' and SBABYCARRIAGE!='없음' and SBABYCARRIAGE!='불가'
+   		</if> 
+   		<if test="parking == 0 and babyCar == 0 and pet == 1">
+   		 	select count(*) from sight where slocation like '%' || #{sLocation} || '%' and spet!='불가' and spet!='없음' 
+   		</if> 
+  		<if test="parking == 1 and babyCar == 1 and pet == 0">
+  			select count(*) from sight where slocation like '%' || #{sLocation} || '%' and SBABYCARRIAGE!='없음' and SBABYCARRIAGE!='불가' and sparking like '%있음%' 
+   		</if>
+   		 <if test="parking == 0 and babyCar == 1 and pet == 1">
+   		 	select count(*) from sight where slocation like '%' || #{sLocation} || '%' and SBABYCARRIAGE!='없음' and SBABYCARRIAGE!='불가' and spet!='불가' and spet!='없음'
+   		</if> 
+   		<if test="parking == 1 and babyCar == 0 and pet == 1">
+   			select count(*) from sight where slocation like '%' || #{sLocation} || '%' and sparking like '%주차 가능%' and sparking='있음' and spet!='불가' and spet!='없음' 
+   		</if> 
+   		<if test="parking == 1 and babyCar == 1 and pet == 1">
+   			select count(*) from sight where slocation like '%' || #{sLocation} || '%' and sparking like '%주차 가능%' and sparking='있음' and SBABYCARRIAGE!='없음' and SBABYCARRIAGE!='불가' and spet!='불가' and spet!='없음'
+   		</if>
+   	</if>
+   </select>
+   
+   <select id="getListCount" resultType="int">
+   		select count(*) from sight
+   </select>
+   
+   	<insert id="insertSightReview" >
+		INSERT INTO REVIEW 
+		VALUES(REVIEW_SEQ.NEXTVAL, #{sNo}, #{userId},#{reviewTitle}, #{reviewContent}, #{reviewScore},
+			#{reviewPicture}, SYSDATE, SYSDATE)
+	</insert>
+	<select id="selectReviewList" resultType="SightReview">
+		SELECT * FROM REVIEW
+		WHERE SNO=#{sNo} order by sNo
+	</select>
+	<select id="selectReview" resultType="SightReview">
+		SELECT * FROM REVIEW 
+		WHERE REVIEWNO=#{reviewNo}
+	</select>
+	<delete id="deleteReview">
+		DELETE FROM REVIEW
+		WHERE REVIEWNO=#{reviewNo}
+	</delete>
+	<update id="modifyReview">
+		UPDATE REVIEW
+		SET REVIEWTITLE=#{reviewTitle} , REVIEWCONTENT=#{reviewContent}
+		 , REVIEWSCORE=#{reviewScore} , REVIEWPICTURE=#{reviewPicture}
+		WHERE REVIEWNO=#{reviewNo}
+	</update>
+	
+</mapper>

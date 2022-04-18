@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="MainMapper">
+	<resultMap type="Urban" id="ResultMapUrban">
+		<result property="urbanNo" column="urban_no"/>
+		<result property="urbanName" column="urban_name"/>
+		<result property="uConfirmedNum" column="u_confirmed_num"/>
+	</resultMap>
+	<resultMap type="City" id="ResultMapCity">
+		<result property="cityNo" column="city_no"/>
+		<result property="cityName" column="city_name"/>
+		<result property="cConfirmedNum" column="c_confirmed_num"/>
+	</resultMap>
+	<!-- 시도별 insert 구문 -->
+	<insert id="insertUrban" parameterType="List">
+		 insert into URBAN
+		 select urban_seq.nextval as URBAN_NO, A.* from
+		(<foreach collection="list" item="urbanList" index="index" separator="union all">
+		<!-- values( #{cityList.cityName}, #{cityList.cConfirmedNum}, #{cityList.cDate} ) -->
+		select #{urbanList.urbanName} as URBAN_NAME, #{urbanList.uConfirmedNum} as U_CONFIRMED_NUM, #{urbanList.uDate} as UDATE from DUAL
+		</foreach>)A
+	</insert>
+	
+	<!-- 시도별 select 구문 -->
+	<select id="selectAllUrban" resultMap="ResultMapUrban">
+		select * from urban
+	</select>
+	
+	<!-- 행정구역별 insert 구문 -->
+	<insert id="insertCity" parameterType="List">
+		 insert into CITY
+		 select city_seq.nextval as CITY_NO, A.* from
+		(<foreach collection="list" item="cityList" index="index" separator="union all">
+		<!-- values( #{cityList.cityName}, #{cityList.cConfirmedNum}, #{cityList.cDate} ) -->
+		select #{cityList.cityName} as CITY_NAME, #{cityList.cConfirmedNum} as C_CONFIRMED_NUM, #{cityList.cDate} as CDATE from DUAL
+		</foreach>)A
+	</insert>
+	
+	<!-- 행정구역(지역) select 구문 -->
+	<select id="selectCity" resultMap="ResultMapCity" parameterType="HashMap">
+	<if test="local.length()==2">	
+	select * from (select substr(city_name,4,3) as city_name, sum(C_CONFIRMED_NUM) as C_CONFIRMED_NUM from city where city_name like '%' || #{local} || '%' and cdate between #{prevDate} and #{currentDate} group by city_name) where city_name is not null
+	</if>
+	<if test="local.length()==3">	
+	select * from (select substr(city_name,5,3) as city_name, sum(C_CONFIRMED_NUM) as C_CONFIRMED_NUM from city where city_name like '%' || #{local} || '%' and cdate between #{prevDate} and #{currentDate} group by city_name) where city_name is not null
+	</if>
+	<if test="local.length()==4">	
+	select * from (select substr(city_name,6,3) as city_name, sum(C_CONFIRMED_NUM) as C_CONFIRMED_NUM from city where city_name like '%' || #{local} || '%' and cdate between #{prevDate} and #{currentDate} group by city_name) where city_name is not null
+	</if>
+	<if test="local.length()==5">	
+	select * from (select substr(city_name,7,3) as city_name, sum(C_CONFIRMED_NUM) as C_CONFIRMED_NUM from city where city_name like '%' || #{local} || '%' and cdate between #{prevDate} and #{currentDate} group by city_name) where city_name is not null
+	</if>
+	<if test="local.length()==7">	
+	select * from (select substr(city_name,9,3) as city_name, sum(C_CONFIRMED_NUM) as C_CONFIRMED_NUM from city where city_name like '%' || #{local} || '%' and cdate between #{prevDate} and #{currentDate} group by city_name) where city_name is not null
+	</if>
+	</select>
+	
+	<!-- 당일날짜 업데이트 유무(행정구역) -->
+	<select id="checkDate" resultType="int">
+		select count(*) from city where cdate=#{currentDate}
+	</select>
+	
+</mapper>

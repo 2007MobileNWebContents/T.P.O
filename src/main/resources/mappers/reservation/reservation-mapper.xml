@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="ReservationMapper">
+
+	<insert id="insertPassenger">
+		INSERT INTO PASSENGER
+		VALUES(PASSENGER_SEQ.NEXTVAL,#{pName},#{pGender},#{pBirthday},#{pNationality},#{pEmail},#{pPhone})
+	</insert>
+	
+	<insert id="insertReservation">
+		INSERT INTO RESERVATION
+		VALUES(RESERVATION_SEQ.NEXTVAL, #{userId}, PASSENGER_SEQ.CURRVAL, SYSDATE, #{rPeople})
+	</insert>
+	
+	<insert id="insertRInfo">
+		INSERT INTO RESERVATION_INFO
+		VALUES(RESERVATION_INFO_SEQ.NEXTVAL, RESERVATION_SEQ.CURRVAL, #{riVihicleId}, #{riDepartureArea}, #{riArrivalArea}, #{riDepartureDate}, #{riArrivalDate}, #{riFare}, #{riSeatGrade})
+	</insert>
+	
+	<insert id="insertRInfo2">
+		INSERT INTO RESERVATION_INFO
+		VALUES(RESERVATION_INFO_SEQ.NEXTVAL, RESERVATION_SEQ.CURRVAL, #{riVihicleId2}, #{riDepartureArea2}, #{riArrivalArea2}, #{riDepartureDate2}, #{riArrivalDate2}, #{riFare2}, #{riSeatGrade2})
+	</insert>
+</mapper>

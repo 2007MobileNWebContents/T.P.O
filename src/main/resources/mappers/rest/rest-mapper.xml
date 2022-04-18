@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="RestMapper">
+	<resultMap type="Rest" id="RestResultMap">
+		<result property="reName" column="RE_NAME" />
+	</resultMap>
+	<resultMap type="RestInfo" id="RestInfoMap">
+		<result property="reName" column="RE_NAME" />
+	</resultMap>
+
+	<update id="insertRest" parameterType="java.util.List">
+		insert into rest (RENO, RE_NAME, READDR, REIMAGE, REPHONE, REURL,
+		REINFO, CHECKIN, CHECKOUT, RTOTAL, PTOTAL, PSTATUS, REFACILITY, CLICK)
+		select REST_SEQ.NEXTVAL as reSeq, T.*
+		from(
+		<foreach collection="list" item="item" index="index"
+			separator="UNION ALL  ">
+			select #{item.reName}, #{item.reAddr}, #{item.reImage}, #{item.rePhone},
+			#{item.reUrl}, #{item.reInfo}, #{item.checkIn},
+			#{item.checkout},
+			#{item.rTotal}, #{item.pTotal}, #{item.pStatus}, #{item.reFacility},
+			0
+			from SYS.DUAL
+		</foreach>
+		)T
+	</update>
+
+	<update id="selectRooms" parameterType="java.util.List">
+		insert into room (RNO, RENO, RONAME, ROPRICE, PLIMIT, PMAXCOUNT,
+		ROINFO, ROFACILITY, ROSIZE, ROCOUNT, ROIMAGE)
+		select ROOM_SEQ.NEXTVAL as roSeq, T.*
+		from(
+		<foreach collection="list" item="item" index="index"
+			separator="UNION ALL  ">
+			select #{item.reNo}, #{item.roName}, #{item.roPrice}, #{item.pLimit},
+			#{item.pMaxCount}, #{item.roInfo}, #{item.roFacility},
+			#{item.roSize}, #{item.roCount},
+			#{item.roImage}
+			from SYS.DUAL
+		</foreach>
+		)T
+
+	</update>
+
+	<select id="selectList" resultMap="RestResultMap">
+		select * from rest
+		order by 2
+	</select>
+
+	<!-- <select id="roomList" resultType="room"> select * from rest join room 
+		using(reNo) where re_name=#{reName}; </select> -->
+
+	<select id="getListCount" resultType="int">
+		<if test="searchName == null">
+		select count(*)
+		from rest		
+		</if>		
+	</select>
+
+	<select id="getSearchCount" resultType="int">
+	<if test="searchName != null">
+		select count(*)
+		from rest
+		where re_name like '%' || #{searchName} || '%'
+	</if>
+	<if test="alignList == 'Name'">
+		select count(*)
+		from rest
+	</if>
+	<if test="alignList == 'Price'">
+		select count(*)
+		from rest
+	</if>
+	<if test="alignList == 'Click'">
+		select count(*)
+		from rest
+	</if>
+ 	<if test="location != null and rAmount !=0">
+	 <![CDATA[
+		select count(*) from
+		(select count(*) from
+		rest join room using(reno)
+		where reAddr
+		like '%'|| #{location}||'%' and pMaxCount >=(#{aAmount}+#{kAmount}) 
+		group by re_name)
+	]]>
+	</if>
+  	<if test ="location !=null and rAmount ==0">
+		select count(*) from rest
+		where reAddr like '%'||#{location}||'%'
+	</if> 
+	 <if test = "minPrice != 0 and maxPrice == 0">
+	 <![CDATA[
+		select count(*) from(
+		select count(*) from
+		rest join room using(reno)
+		where roPrice>=#{minPrice}
+		group by re_name)
+		]]>
+	</if> 
+	<if test = "maxPrice != 0 and minPrice == 0">
+	 <![CDATA[
+		select count(*) from(
+		select count(*) from
+		rest join room using(reno)
+		where roPrice<=#{maxPrice}
+		group by re_name)
+		]]>
+	</if>
+	<if test = "maxPrice != 0 and minPrice !=0">
+	<![CDATA[
+		select count(*)
+		from(select count(*) from rest join room using(reno)
+		where roPrice between #{minPrice} and #{maxPrice}
+		group by re_name)
+		]]>
+	</if>
+	</select>
+
+	<select id="selectRoomList" resultMap="RestInfoMap">
+		select * from room join
+		rest using(reNo)
+		where reNo = #{reNo}
+		order by 1
+		
+	</select>
+	<!-- MainPage(김승태) -->
+	<select id="selectAllRest" resultMap="RestResultMap">
+		select * from rest
+	</select>
+	<select id="selectAllRoom" resultType="Room">
+		select * from room
+	</select>
+
+	<select id="roomInfo" resultType="Room">
+		select * from room
+		where rNo =
+		#{rNo}
+	</select>
+
+	<update id="addCount">
+		update rest set click = click + 1
+		where reNo = #{reNo}
+	</update>
+
+	<!-- 숙소명 조회 -->
+	<select id="SearchrName" resultMap="RestResultMap">
+		select * from rest
+		where
+		re_name like '%' || #{searchName} || '%'
+	</select>
+
+	<!-- 숙소 가격 조회 -->
+	<select id="SearchPrice" resultMap="RestInfoMap">
+		select rest.re_name,
+		min(room.roPrice)as rowMin, rest.rePhone, rest.READDR, rest.RENO,
+		rest.REIMAGE
+		from rest join room on rest.reNo = room.RENO
+		<where>
+		<if test="minPrice != 0">
+		room.roprice between #{minPrice} and #{maxPrice}
+		group by rest.re_name,
+		rest.rePhone, rest.READDR, rest.reNo, rest.REIMAGE
+		order by rest.RE_NAME
+		</if>
+		<if test="minPrice == 0">
+		  <![CDATA[
+		room.roprice <= #{maxPrice}
+		group by rest.re_name,
+		rest.rePhone, rest.READDR, rest.reNo, rest.REIMAGE
+		order by rest.RE_NAME
+		]]>
+		</if>
+		</where>
+	</select>
+	
+	<select id="priceRowSearch" resultMap="RestInfoMap">
+	 <![CDATA[
+		select rest.re_name,
+		min(room.roPrice)as rowMin, rest.rePhone, rest.READDR, rest.RENO,
+		rest.REIMAGE
+		from rest join room on rest.reNo = room.RENO
+		where room.roprice >= #{minPrice}
+		group by rest.re_name, rest.rePhone, rest.READDR, rest.reNo, rest.REIMAGE
+		order by rest.RE_NAME
+		]]>
+	</select>
+
+	<!-- 정렬 join -->
+	<select id="alignList" resultMap="RestInfoMap">
+		<if test="alignList == 'Name'">
+			select * from rest order by re_name
+		</if>
+		<if test="alignList == 'Price'">
+			select
+			rest.re_Name, min(room.roPrice)as rowMin, rest.rePhone, rest.reAddr, rest.reImage, rest.reNO
+			from rest join room on rest.reNo = room.RENO
+			group by rest.re_Name, rest.rePhone, rest.reAddr, rest.reImage, rest.reNo
+			order by rowMin, re_Name
+		</if>
+		<if test="alignList == 'Click'">
+			select
+			rest.re_Name, rest.CLICK, rest.rePhone, rest.reAddr, rest.reImage, rest.reNO
+			from rest join room on rest.reNo = room.RENO
+			group by rest.CLICK, rest.re_name, rest.rePhone, rest.reAddr, rest.reImage, rest.reNO
+			order by rest.CLICK desc
+		</if>
+	</select>
+
+	<!-- 지역조회 -->
+	<select id="searchLocal" resultMap="RestInfoMap">
+		select
+		rest.re_name,
+		min(room.roPrice) as rowMin, rest.rePhone, rest.READDR, rest.RENO,
+		rest.REIMAGE
+		from rest join room on rest.reNo = room.RENO
+		where reAddr
+		like '%'||#{location}||'%'
+		group by rest.re_name, rest.rePhone,
+		rest.READDR, rest.RENO, rest.REIMAGE
+	</select>
+
+	<!-- 지역, 객실, 인원조회 -->
+	<select id="searchAllList" resultMap="RestInfoMap">
+	  <![CDATA[
+		select
+		re_name, min(roPrice)*${sleep}*${rAmount}as sumPrice, rePhone, reAddr, reNo, reImage
+		from rest join room using(reNo)
+		where reAddr like '%'||#{location}||'%' and pLimit <=
+		(#{aAmount}+#{kAmount}) and pMaxCount >= (#{aAmount}+#{kAmount})
+		group by re_name, rePhone, reAddr, reNo, reImage
+		]]>
+	</select>
+
+</mapper>

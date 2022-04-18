@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd" >
+<configuration>
+	<settings>
+		<setting name="jdbcTypeForNull" value="NULL"></setting>
+<!-- 		만약 null로 데이터가 전달되었다면 빈칸이 아닌 'NULL'로 인식하도록 설정
+		* value 설정시 null은 반드시 대문자로 작성! -->
+	</settings>
+	<typeAliases>
+		<typeAlias type="com.kh.tpo.member.domain.Member" alias="Member"/>
+		<typeAlias type="com.kh.tpo.rest.domain.Rest" alias="Rest"/>
+		<typeAlias type="com.kh.tpo.main.domain.City" alias="City"/>
+		<typeAlias type="com.kh.tpo.main.domain.Urban" alias="Urban"/>
+		<typeAlias type="com.kh.tpo.rest.domain.Room" alias="Room"/>
+		<typeAlias type="com.kh.tpo.sight.domain.MainSight" alias="MainSight"/>
+		<typeAlias type="com.kh.tpo.sight.domain.Sight" alias="Sight"/>
+		<typeAlias type="com.kh.tpo.sight.domain.SightReview" alias="SightReview"/>
+		<typeAlias type="com.kh.tpo.rest.domain.RestInfo" alias="RestInfo"/>
+		<typeAlias type="com.kh.tpo.reservation.domain.Passenger" alias="Passenger"/>
+		<typeAlias type="com.kh.tpo.reservation.domain.Reservation" alias="Reservation"/>
+		<typeAlias type="com.kh.tpo.member.domain.ReservationInfo" alias="RInfo"/>
+		<typeAlias type="com.kh.tpo.member.domain.ReservationInfo2" alias="RInfo2"/>
+	</typeAliases>
+	
+	<mappers>
+		<mapper resource="mappers/member/member-mapper.xml"/>
+		<mapper resource="mappers/rest/rest-mapper.xml"/>
+		<mapper resource="mappers/main/main-mapper.xml"/>
+		<mapper resource="mappers/sight/sight-mapper.xml"/>
+		<mapper resource="mappers/reservation/reservation-mapper.xml"/>
+	</mappers>
+</configuration>

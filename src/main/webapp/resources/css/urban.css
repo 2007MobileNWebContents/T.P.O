@@ -1,0 +1,71 @@
+@charset "UTF-8";
+
+.URBANOUTLINE {
+    stroke-linejoin:round;
+    stroke: #6e6e6e;
+    stroke-width: 1;
+} 
+#CD11 {
+    fill: #dcdcdc;
+}
+#CD26 {
+    fill:#ededed;
+}
+#CD27 {
+    fill: #ededed;
+}
+#CD28 {
+    fill:#ededed;
+}
+#CD29 {
+    fill: #ededed;
+}
+#CD30 {
+    fill: #ededed;
+}
+#CD31 {
+    fill: #ededed;
+}
+#CD36 {
+    fill:	#ededed;
+}
+#CD41 {
+    fill: #ededed;
+}
+#CD42 {
+    fill: #ededed;
+}
+#CD43 {
+    fill: #ededed;
+}
+#CD44 {
+    fill: #ededed;
+}
+#CD45 {
+    fill: #ededed;
+}
+#CD46 {
+    fill:#ededed;
+}
+#CD47 {
+    fill: #ededed;
+}
+#CD48 {
+    fill: #ededed;
+}
+#CD50 {
+    fill: #ededed;
+}
+.URBANTEXT {
+    fill: black;
+    font-size: 16;
+    font-weight: bold;
+    text-anchor: middle;
+    alignment-baseline: middle;
+   }
+.URBANTEXT a {
+	cursor: hand;
+}
+.URBANTEXT:hover {
+	fill: red;
+}

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="MemberMapper">
+	<resultMap type="Member" id="MemberResultMap">
+		<result property="mCreateDate" column="m_create_date"/>
+		<result property="mModifyDate" column="m_modify_date"/>
+	</resultMap>
+	<resultMap type="RInfo" id="RInfoResultMap">
+		<result property="enNo" column="en_no"/>
+		<result property="rDate" column="r_date"/>
+		<result property="rPeople" column="r_people"/>
+		<result property="riNo" column="ri_no"/>
+		<result property="riVihicleId" column="ri_vihicle_id"/>
+		<result property="riDepartureArea" column="ri_departure_area"/>
+		<result property="riArrivalArea" column="ri_arrival_area"/>
+		<result property="riDepartureDate" column="ri_departure_date"/>
+		<result property="riArrivalDate" column="ri_arrival_date"/>
+		<result property="riFare" column="ri_fare"/>
+		<result property="riSeatGrade" column="ri_seatgrade"/>
+	</resultMap>
+	<!-- 로그인 -->
+	<select id="selectOne" resultMap="MemberResultMap">
+		select * from member where  userid=#{userId} and userpwd=#{userPwd} and mstatus='Y'
+	</select>
+	<!-- 아이디 유효성 검사 -->
+	<select id="checkIdDup" resultType="int">
+		select count(*) from member where userid=#{userId}
+	</select>
+	<!-- 회원가입 -->
+	<insert id="insertMember">
+		insert into member
+		values(#{userId},#{userPwd},#{userName},#{age},#{gender},#{email},#{phone},#{address},#{domestic},SYSDATE,SYSDATE,DEFAULT)
+	</insert>
+	<!-- 아이디 찾기 -->
+	<select id="searchId" resultMap="MemberResultMap">
+		select * from member where username=#{userName} and phone=#{phone} and mstatus='Y'
+	</select>
+	<!-- 비밀번호 찾기(email 유효성 검사) -->
+	<select id="emailChk" resultType="int">
+		select count(*) from member where userid=#{userId} and email=#{email} and mstatus='Y'
+	</select>
+	<!-- 비밀번호 찾기-->
+	<select id="searchPwd" resultMap="MemberResultMap">
+		select * from member where userid=#{userId} and email=#{email} and mstatus='Y'
+	</select>
+	<!-- 회원정보수정 -->
+	<update id="updateMember">
+		update member
+		set userpwd=#{userPwd}, gender=#{gender}, email=#{email}, domestic=#{domestic}, phone=#{phone}, address=#{address}, m_modify_date=SYSDATE
+		where userid=#{userId} and mstatus='Y'
+	</update>
+	<!-- 회원탈퇴(update) -->
+	<update id="deleteMember">
+		update member
+		set mstatus='N'
+		where userid=#{userId} and userpwd=#{userPwd}
+	</update>
+	<!-- 회원예약정보 불러오기 -->
+	<select id="reservationInfo" resultMap="RInfoResultMap">
+		select * from reservation 
+		join reservation_info using (en_no)
+		where userId=#{userId}
+	</select>
+	<!--  예약정보 취소 -->
+	<delete id="reservationCancel">
+		delete from RESERVATION_INFO where ri_no=#{riNo}
+	</delete>
+	<!-- 회원 핸드폰번호 체크-->
+	<select id="phoneChk" resultType="int">
+		select count(*) from member where phone=#{phone}
+	</select>
+</mapper>
